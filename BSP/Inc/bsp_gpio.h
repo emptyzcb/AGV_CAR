@@ -49,13 +49,13 @@
 /* ---- UART (USART1) ---- */
 #define COMM_UART                   USART1
 #define COMM_UART_AF                GPIO_AF7_USART1
-#define COMM_UART_TX_PORT           GPIOB
-#define COMM_UART_TX_PIN            GPIO_PIN_6
-#define COMM_UART_RX_PORT           GPIOB
-#define COMM_UART_RX_PIN            GPIO_PIN_7
-#define COMM_UART_PORT              GPIOB
+#define COMM_UART_TX_PORT           GPIOA
+#define COMM_UART_TX_PIN            GPIO_PIN_9
+#define COMM_UART_RX_PORT           GPIOA
+#define COMM_UART_RX_PIN            GPIO_PIN_10
+#define COMM_UART_PORT              GPIOA
 #define COMM_UART_CLK_ENABLE()      __HAL_RCC_USART1_CLK_ENABLE()
-#define COMM_UART_GPIO_CLK_ENABLE() __HAL_RCC_GPIOB_CLK_ENABLE()
+#define COMM_UART_GPIO_CLK_ENABLE() __HAL_RCC_GPIOA_CLK_ENABLE()
 
 /* ---- LED ---- */
 #define LED_HEARTBEAT_PORT          GPIOC

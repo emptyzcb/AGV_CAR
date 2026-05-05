@@ -1,14 +1,19 @@
 /**
   * @file    bsp_uart.c
   * @brief   USART1 driver: interrupt RX with ring buffer
+  *
+  * USART1 is initialized by CubeMX (MX_USART1_UART_Init in main.c).
+  * This module only provides TX/RX helper functions and a ring buffer
+  * for interrupt-driven reception.
   */
 
 #include "bsp_uart.h"
-#include "bsp_gpio.h"
+#include "main.h"
 
 #define RX_BUF_SIZE 512
 
-static UART_HandleTypeDef huart1;
+extern UART_HandleTypeDef huart1;
+
 static uint8_t  rx_ring[RX_BUF_SIZE];
 static volatile uint16_t rx_head = 0;
 static volatile uint16_t rx_tail = 0;
@@ -17,26 +22,8 @@ static BSP_UART_RxCb_t rx_cb = NULL;
 
 void BSP_UART_Init(uint32_t baudrate)
 {
-    COMM_UART_GPIO_CLK_ENABLE();
-    COMM_UART_CLK_ENABLE();
-
-    GPIO_InitTypeDef gpio = {0};
-    gpio.Pin       = COMM_UART_TX_PIN | COMM_UART_RX_PIN;
-    gpio.Mode      = GPIO_MODE_AF_PP;
-    gpio.Pull      = GPIO_PULLUP;
-    gpio.Speed     = GPIO_SPEED_FREQ_HIGH;
-    gpio.Alternate = COMM_UART_AF;
-    HAL_GPIO_Init(COMM_UART_PORT, &gpio);
-
-    huart1.Instance          = COMM_UART;
-    huart1.Init.BaudRate     = baudrate;
-    huart1.Init.WordLength   = UART_WORDLENGTH_8B;
-    huart1.Init.StopBits     = UART_STOPBITS_1;
-    huart1.Init.Parity       = UART_PARITY_NONE;
-    huart1.Init.Mode         = UART_MODE_TX_RX;
-    huart1.Init.HwFlowCtl    = UART_HWCONTROL_NONE;
-    huart1.Init.OverSampling = UART_OVERSAMPLING_16;
-    HAL_UART_Init(&huart1);
+    (void)baudrate;
+    /* USART1 is already initialized by MX_USART1_UART_Init() in main.c */
 }
 
 int BSP_UART_Send(const uint8_t *data, uint16_t len)
@@ -66,7 +53,7 @@ void BSP_UART_RegisterCallback(BSP_UART_RxCb_t cb)
 /* Called from HAL UART IRQ handler */
 void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
 {
-    if (huart->Instance == COMM_UART)
+    if (huart->Instance == USART1)
     {
         /* Push byte into ring buffer */
         uint16_t next = (rx_head + 1) % RX_BUF_SIZE;
@@ -98,17 +85,4 @@ uint16_t BSP_UART_Read(uint8_t *buf, uint16_t len)
         rx_tail = (rx_tail + 1) % RX_BUF_SIZE;
     }
     return count;
-}
-
-/* UART MSP init (called by HAL_UART_Init) */
-void HAL_UART_MspInit(UART_HandleTypeDef *huart)
-{
-    /* GPIO already configured in BSP_UART_Init, nothing extra needed */
-    (void)huart;
-}
-
-/* USART1 IRQ handler */
-void USART1_IRQHandler(void)
-{
-    HAL_UART_IRQHandler(&huart1);
 }

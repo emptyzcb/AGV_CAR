@@ -8,6 +8,8 @@
 
 #include <stdint.h>
 #include "pid.h"
+#include "filter.h"
+
 
 typedef enum {
     MOTOR_CTRL_STOP = 0,
@@ -32,8 +34,6 @@ typedef struct {
     /* Measurement */
     Filter_EMA_t speed_filter;  /* forward declare - need filter.h */
 } MotorCtrl_t;
-
-#include "filter.h"
 
 void  MotorCtrl_Init(MotorCtrl_t *ctrl, float counts_per_rev, float sample_period_s);
 void  MotorCtrl_SetPID(MotorCtrl_t *ctrl, float kp, float ki, float kd);

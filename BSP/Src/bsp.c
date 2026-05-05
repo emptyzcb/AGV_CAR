@@ -14,5 +14,4 @@ void BSP_Init(void)
     BSP_System_Init();
     BSP_Motor_Init();
     BSP_Encoder_Init();
-    BSP_UART_Init(115200);
 }

@@ -5,11 +5,11 @@
 
 #include "agv_task.h"
 #include "motor_ctrl.h"
+#include "bsp_motor.h"
+#include "bsp_encoder.h"
 #include "motion.h"
 #include "monitor.h"
-#include "micro_ros_node.h"
 #include "cmsis_os2.h"
-#include <math.h>
 
 /* ---- Shared state ---- */
 static AGV_State_t agv_state = {
@@ -45,7 +45,7 @@ void AGV_SetVelocity(float linear, float angular)
 {
     agv_state.target_linear  = linear;
     agv_state.target_angular = angular;
-    agv_state.last_cmd_tick  = osKernelGetTick();
+    agv_state.last_cmd_tick  = osKernelGetTickCount();
 }
 
 /* ---- MotorCtrl Task: 10ms ---- */
@@ -58,7 +58,7 @@ void MotorCtrl_TaskEntry(void *argument)
     MotorCtrl_Init(&motor_ctrl[MOTOR_LEFT],  1320.0f, 0.01f);
     MotorCtrl_Init(&motor_ctrl[MOTOR_RIGHT], 1320.0f, 0.01f);
 
-    uint32_t tick = osKernelGetTick();
+    uint32_t tick = osKernelGetTickCount();
     for (;;)
     {
         MotorCtrl_Update(&motor_ctrl[MOTOR_LEFT],  MOTOR_LEFT,  ENCODER_LEFT,  10);
@@ -77,7 +77,7 @@ void Motion_TaskEntry(void *argument)
     /* Default: wheel_radius=0.033m, wheel_base=0.160m */
     Motion_Init(&motion, 0.033f, 0.160f, 1320.0f);
 
-    uint32_t tick = osKernelGetTick();
+    uint32_t tick = osKernelGetTickCount();
     for (;;)
     {
         /* Compute inverse kinematics from velocity commands */
@@ -92,20 +92,6 @@ void Motion_TaskEntry(void *argument)
         float right_rps = MotorCtrl_GetSpeed(&motor_ctrl[MOTOR_RIGHT]);
         Motion_ForwardKinematics(&motion, left_rps, right_rps);
 
-        /* Update shared odom data for micro-ROS publisher */
-        {
-            const float dt = 0.020f;
-            g_odom_data.linear_vel  = motion.meas_linear;
-            g_odom_data.angular_vel = motion.meas_angular;
-            g_odom_data.theta += motion.meas_angular * dt;
-            /* Normalize theta to [-pi, pi] */
-            while (g_odom_data.theta >  3.14159265f) g_odom_data.theta -= 6.28318530f;
-            while (g_odom_data.theta < -3.14159265f) g_odom_data.theta += 6.28318530f;
-            g_odom_data.x += motion.meas_linear * cosf(g_odom_data.theta) * dt;
-            g_odom_data.y += motion.meas_linear * sinf(g_odom_data.theta) * dt;
-            g_odom_data.timestamp_ms = osKernelGetTick();
-        }
-
         tick += 20;
         osDelayUntil(tick);
     }
@@ -117,13 +103,13 @@ void AgvMain_TaskEntry(void *argument)
 {
     (void)argument;
 
-    uint32_t tick = osKernelGetTick();
+    uint32_t tick = osKernelGetTickCount();
     for (;;)
     {
         /* Command timeout check: stop if no cmd for 2 seconds */
         if (agv_state.mode == AGV_MODE_REMOTE)
         {
-            if ((osKernelGetTick() - agv_state.last_cmd_tick) > 2000)
+            if ((osKernelGetTickCount() - agv_state.last_cmd_tick) > 2000)
             {
                 AGV_SetMode(AGV_MODE_IDLE);
             }
@@ -150,7 +136,7 @@ void Heartbeat_TaskEntry(void *argument)
 {
     (void)argument;
 
-    uint32_t tick = osKernelGetTick();
+    uint32_t tick = osKernelGetTickCount();
     for (;;)
     {
         Monitor_Heartbeat();

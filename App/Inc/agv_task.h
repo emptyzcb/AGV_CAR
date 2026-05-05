@@ -7,7 +7,6 @@
 #define AGV_TASK_H
 
 #include <stdint.h>
-#include "micro_ros_node.h"
 
 typedef enum {
     AGV_MODE_IDLE   = 0,
