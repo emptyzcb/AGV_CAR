@@ -39,6 +39,8 @@ static const osThreadAttr_t heartbeat_attr = {
     .priority   = osPriorityBelowNormal,
 };
 
+
+
 void TaskManager_CreateAll(void)
 {
     cmdQueueHandle = osMessageQueueNew(8, sizeof(uint32_t), NULL);

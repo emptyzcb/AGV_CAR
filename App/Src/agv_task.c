@@ -131,7 +131,6 @@ void AgvMain_TaskEntry(void *argument)
 }
 
 /* ---- Heartbeat Task: 500ms ---- */
-
 void Heartbeat_TaskEntry(void *argument)
 {
     (void)argument;

@@ -24,9 +24,8 @@ void Monitor_CheckStack(void)
     (void)0;
 }
 
-uint32_t Monitor_GetStackHighWater(const char *task_name)
+uint32_t Monitor_GetStackHighWater(TaskHandle_t handle)
 {
-    TaskHandle_t handle = xTaskGetHandle(task_name);
     if (handle != NULL)
         return uxTaskGetStackHighWaterMark(handle) * sizeof(StackType_t);
     return 0;
