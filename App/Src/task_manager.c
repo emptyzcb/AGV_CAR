@@ -5,12 +5,14 @@
 
 #include "task_manager.h"
 #include "agv_task.h"
+#include "imu_task.h"
 
 /* Task handles */
 osThreadId_t motorCtrlTaskHandle;
 osThreadId_t motionTaskHandle;
 osThreadId_t heartbeatTaskHandle;
 osThreadId_t agvMainTaskHandle;
+osThreadId_t imuTaskHandle;
 
 /* Message queue */
 osMessageQueueId_t cmdQueueHandle;
@@ -39,6 +41,12 @@ static const osThreadAttr_t heartbeat_attr = {
     .priority   = osPriorityBelowNormal,
 };
 
+static const osThreadAttr_t imu_attr = {
+    .name       = "IMU",
+    .stack_size = 256 * 4,
+    .priority   = osPriorityAboveNormal,
+};
+
 
 
 void TaskManager_CreateAll(void)
@@ -49,4 +57,5 @@ void TaskManager_CreateAll(void)
     motionTaskHandle    = osThreadNew(Motion_TaskEntry,    NULL, &motion_attr);
     agvMainTaskHandle   = osThreadNew(AgvMain_TaskEntry,   NULL, &agvMain_attr);
     heartbeatTaskHandle = osThreadNew(Heartbeat_TaskEntry, NULL, &heartbeat_attr);
+    imuTaskHandle       = osThreadNew(IMU_TaskEntry,       NULL, &imu_attr);
 }

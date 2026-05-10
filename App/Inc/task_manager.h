@@ -12,6 +12,7 @@ extern osThreadId_t motorCtrlTaskHandle;
 extern osThreadId_t motionTaskHandle;
 extern osThreadId_t heartbeatTaskHandle;
 extern osThreadId_t agvMainTaskHandle;
+extern osThreadId_t imuTaskHandle;
 
 extern osMessageQueueId_t cmdQueueHandle;
 
