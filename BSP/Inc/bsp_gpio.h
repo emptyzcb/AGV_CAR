@@ -57,6 +57,21 @@
 #define COMM_UART_CLK_ENABLE()      __HAL_RCC_USART1_CLK_ENABLE()
 #define COMM_UART_GPIO_CLK_ENABLE() __HAL_RCC_GPIOA_CLK_ENABLE()
 
+/* ---- IMU SPI (SPI3: PC10=SCK, PC11=MISO, PC12=MOSI) ---- */
+#define IMU_SPI                     SPI3
+#define IMU_SPI_AF                  GPIO_AF6_SPI3
+#define IMU_SPI_PORT                GPIOC
+#define IMU_SPI_SCK_PIN             GPIO_PIN_10
+#define IMU_SPI_MISO_PIN            GPIO_PIN_11
+#define IMU_SPI_MOSI_PIN            GPIO_PIN_12
+#define IMU_SPI_GPIO_CLK_ENABLE()   __HAL_RCC_GPIOC_CLK_ENABLE()
+#define IMU_SPI_CLK_ENABLE()        __HAL_RCC_SPI3_CLK_ENABLE()
+
+/* ---- IMU CS (PB0, software controlled) ---- */
+#define IMU_CS_PORT                 GPIOB
+#define IMU_CS_PIN                  GPIO_PIN_0
+#define IMU_CS_GPIO_CLK_ENABLE()    __HAL_RCC_GPIOB_CLK_ENABLE()
+
 /* ---- LED ---- */
 #define LED_HEARTBEAT_PORT          GPIOC
 #define LED_HEARTBEAT_PIN           GPIO_PIN_13

@@ -2,13 +2,13 @@
   * @file    imu_task.c
   * @brief   IMU task (10ms) with Mahony complementary filter attitude estimation
   *
-  *          Driver interface is a stub — replace IMU_Driver_ReadData()
-  *          when BSP driver is implemented.
+  *          Driver: BSP IMU660RC (LSM6DSV16X) via SPI3.
   */
 
 #include "imu_task.h"
 #include <math.h>
 #include "cmsis_os2.h"
+#include "bsp_imu.h"
 
 #ifndef M_PI
 #define M_PI 3.14159265358979323846f
@@ -24,19 +24,21 @@ static IMU_Attitude_t imu_attitude;
 static Mahony_Filter_t mahony;
 
 /* ============================================================
- * Driver stub — returns zeroed data, replace with real driver
+ * Driver interface — reads from BSP IMU660RC (LSM6DSV16X)
  * ============================================================ */
 static int8_t IMU_Driver_ReadData(IMU_RawData_t *data)
 {
-    (void)data;
-    /* TODO: replace with real IMU660RC driver read */
-    data->accel[0] = 0.0f;
-    data->accel[1] = 0.0f;
-    data->accel[2] = 9.8f;  /* stationary: 1g on Z axis */
-    data->gyro[0]  = 0.0f;
-    data->gyro[1]  = 0.0f;
-    data->gyro[2]  = 0.0f;
-    return 0; /* success */
+    BSP_IMU_Data_t bsp_data;
+    if (BSP_IMU_ReadData(&bsp_data) != 0)
+        return -1;
+
+    data->accel[0] = bsp_data.accel[0];
+    data->accel[1] = bsp_data.accel[1];
+    data->accel[2] = bsp_data.accel[2];
+    data->gyro[0]  = bsp_data.gyro[0];
+    data->gyro[1]  = bsp_data.gyro[1];
+    data->gyro[2]  = bsp_data.gyro[2];
+    return 0;
 }
 
 /* ============================================================

@@ -8,10 +8,12 @@
 #include "bsp_motor.h"
 #include "bsp_encoder.h"
 #include "bsp_uart.h"
+#include "bsp_imu.h"
 
 void BSP_Init(void)
 {
     BSP_System_Init();
     BSP_Motor_Init();
     BSP_Encoder_Init();
+    BSP_IMU_Init();
 }
